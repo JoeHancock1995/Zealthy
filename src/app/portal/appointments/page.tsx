@@ -43,7 +43,7 @@ export default async function PortalAppointmentsPage() {
     <main>
       <div className="space-between" style={{ marginBottom: 20 }}>
         <div>
-          <span className="badge">Patient Portal / Appointments</span>
+          <span className="">Patient Portal / Appointments</span>
           <h1 style={{ marginTop: 12 }}>Upcoming Appointments</h1>
           <p>All appointment occurrences scheduled in the next 3 months.</p>
         </div>

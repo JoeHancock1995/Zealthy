@@ -43,7 +43,7 @@ export default async function PortalPrescriptionsPage() {
     <main>
       <div className="space-between" style={{ marginBottom: 20 }}>
         <div>
-          <span className="badge">Patient Portal / Prescriptions</span>
+          <span className="">Patient Portal / Prescriptions</span>
           <h1 style={{ marginTop: 12 }}>Prescriptions</h1>
           <p>Medication records and refill occurrences in the next 3 months.</p>
         </div>

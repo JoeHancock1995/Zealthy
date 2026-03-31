@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <main>
           <div className="space-between" style={{ marginBottom: 24 }}>
             <div>
-              <div className="badge">Zealthy Exercise</div>
+              <div className="">Zealthy Exercise</div>
               <h1 style={{ marginTop: 12 }}>Mini-EMR & Patient Portal</h1>
             </div>
             <nav className="row">

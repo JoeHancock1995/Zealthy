@@ -78,7 +78,7 @@ export default async function PortalPage() {
     <main>
       <div className="space-between" style={{ marginBottom: 20 }}>
         <div>
-          <span className="badge">Patient Portal</span>
+          <span className="">Patient Portal</span>
           <h1 style={{ marginTop: 12 }}>Welcome, {patient.name}</h1>
           <p>Your summary for the next 7 days.</p>
         </div>

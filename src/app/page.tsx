@@ -33,7 +33,7 @@ export default function LoginPage() {
       <div className="grid grid-2" style={{ alignItems: "start" }}>
         <section className="card">
           <div className="stack">
-            <span className="badge">Patient Portal</span>
+            <span className="">Patient Portal</span>
             <h1>Log in</h1>
             <p>
               Sign in to view your upcoming appointments, medication refills, and
