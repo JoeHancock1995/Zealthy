@@ -32,7 +32,7 @@ export default async function PortalPrescriptionsPage() {
 
   if (!patient) {
     const { redirect } = await import("next/navigation");
-    redirect("/");
+    return redirect("/");
   }
 
   const now = new Date();

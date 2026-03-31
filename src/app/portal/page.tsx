@@ -117,8 +117,8 @@ export default async function PortalPage() {
           <div className="stack">
             <h3>Refills in 7 Days</h3>
             <div>{upcomingRefills7Days.length}</div>
-            <Link href="/portal/prescriptions">View all prescriptions</Link>
-          </div>
+              <Link href="/portal/prescriptions">View all prescriptions</Link> 
+            </div>
         </section>
       </div>
 
