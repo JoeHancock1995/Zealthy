@@ -12,17 +12,6 @@ function formatDate(value: Date | null | undefined) {
     }).format(new Date(value));
 }
 
-function formatForDateTimeLocal(value: Date | string) {
-    const date = new Date(value);
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, "0");
-    const day = `${date.getDate()}`.padStart(2, "0");
-    const hours = `${date.getHours()}`.padStart(2, "0");
-    const minutes = `${date.getMinutes()}`.padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
 function formatRepeatSchedule(value: string) {
     if (!value) return "None";
     return value.charAt(0).toUpperCase() + value.slice(1);
@@ -64,7 +53,7 @@ export default async function PatientPrescriptionsPage({
                 <div>
                     <span className="badge">Admin / Patient / Prescriptions</span>
                     <h1 style={{ marginTop: 12 }}>Manage Prescriptions</h1>
-                    <p>Create and manage medication records for {patient.name}.</p>
+                    <p>Create, edit, and delete medication records for {patient.name}.</p>
                 </div>
 
                 <div className="row">
@@ -132,23 +121,12 @@ export default async function PatientPrescriptionsPage({
 
                             <label>
                                 Quantity
-                                <input
-                                    name="quantity"
-                                    type="number"
-                                    min="1"
-                                    step="1"
-                                    placeholder="30"
-                                    required
-                                />
+                                <input name="quantity" type="number" min="1" step="1" placeholder="30" required />
                             </label>
 
                             <label>
                                 Refill Date
-                                <input
-                                    name="refillDate"
-                                    type="datetime-local"
-                                    required
-                                />
+                                <input name="refillDate" type="datetime-local" required />
                             </label>
 
                             <label>
@@ -248,6 +226,14 @@ export default async function PatientPrescriptionsPage({
                                         <td>{formatDate(prescription.endDate)}</td>
                                         <td>
                                             <div className="row">
+                                                <Link
+                                                    href={`/admin/patients/${patient.id}/prescriptions/${prescription.id}/edit`}
+                                                >
+                                                    <button type="button" className="secondary" style={{ width: "auto" }}>
+                                                        Edit
+                                                    </button>
+                                                </Link>
+
                                                 <form action={deletePrescriptionWithIds} className="inline">
                                                     <button
                                                         type="submit"
@@ -265,16 +251,6 @@ export default async function PatientPrescriptionsPage({
                         </tbody>
                     </table>
                 )}
-            </section>
-
-            <section className="card" style={{ marginTop: 20 }}>
-                <div className="stack">
-                    <h2>Testing Examples</h2>
-                    <p className="small">
-                        Example refill date value for quick testing:
-                    </p>
-                    <code>{formatForDateTimeLocal(new Date())}</code>
-                </div>
             </section>
         </main>
     );
