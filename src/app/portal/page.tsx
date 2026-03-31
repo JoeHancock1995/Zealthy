@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { requirePatientSession } from "@/lib/auth";
 import { expandAppointments, expandPrescriptions } from "@/lib/portal";
 import { logoutPatient } from "./actions";
+import { redirect } from "next/navigation";
 
 function formatDate(value: Date | null | undefined) {
   if (!value) return "—";
@@ -14,21 +15,21 @@ function formatDate(value: Date | null | undefined) {
   }).format(new Date(value));
 }
 
-async function logout() {
-  "use server";
+// async function logout() {
+//   "use server";
 
-  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/logout`, {
-    method: "POST",
-  }).catch(() => null);
+//   const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/api/logout`, {
+//     method: "POST",
+//   }).catch(() => null);
 
-  if (!response?.ok) {
-    const { clearPatientSession } = await import("@/lib/auth");
-    await clearPatientSession();
-  }
+//   if (!response?.ok) {
+//     const { clearPatientSession } = await import("@/lib/auth");
+//     await clearPatientSession();
+//   }
 
-  const { redirect } = await import("next/navigation");
-  redirect("/");
-}
+//   const { redirect } = await import("next/navigation");
+//   redirect("/");
+// }
 
 export default async function PortalPage() {
   const patientId = await requirePatientSession();
@@ -42,7 +43,6 @@ export default async function PortalPage() {
   });
 
   if (!patient) {
-    const { redirect } = await import("next/navigation");
     redirect("/");
   }
 

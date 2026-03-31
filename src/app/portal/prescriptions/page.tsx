@@ -3,6 +3,8 @@ import { addMonths } from "date-fns";
 import { db } from "@/lib/db";
 import { requirePatientSession } from "@/lib/auth";
 import { expandPrescriptions } from "@/lib/portal";
+import { redirect } from "next/navigation";
+
 
 function formatDate(value: Date | null | undefined) {
   if (!value) return "—";
@@ -31,8 +33,7 @@ export default async function PortalPrescriptionsPage() {
   });
 
   if (!patient) {
-    const { redirect } = await import("next/navigation");
-    return redirect("/");
+    redirect("/");
   }
 
   const now = new Date();

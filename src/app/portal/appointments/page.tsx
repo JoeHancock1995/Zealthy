@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { addMonths } from "date-fns";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { requirePatientSession } from "@/lib/auth";
 import { expandAppointments } from "@/lib/portal";
@@ -31,7 +32,6 @@ export default async function PortalAppointmentsPage() {
   });
 
   if (!patient) {
-    const { redirect } = await import("next/navigation");
     redirect("/");
   }
 
@@ -43,7 +43,7 @@ export default async function PortalAppointmentsPage() {
     <main>
       <div className="space-between" style={{ marginBottom: 20 }}>
         <div>
-          <span className="">Patient Portal / Appointments</span>
+          <span className="badge">Patient Portal / Appointments</span>
           <h1 style={{ marginTop: 12 }}>Upcoming Appointments</h1>
           <p>All appointment occurrences scheduled in the next 3 months.</p>
         </div>
