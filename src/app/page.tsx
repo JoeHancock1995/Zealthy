@@ -1,30 +1,89 @@
-import { loginAction } from "@/app/actions";
+"use client";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const params = await searchParams;
+import { useState } from "react";
+
+export default function LoginPage() {
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setLoading(true);
+
+    const formData = new FormData(event.currentTarget);
+
+    const response = await fetch("/api/login", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (response.ok) {
+      window.location.href = "/portal";
+      return;
+    }
+
+    const data = await response.json().catch(() => null);
+    setError(data?.error ?? "Unable to log in.");
+    setLoading(false);
+  }
+
   return (
-    <div className="grid grid-2">
-      <section className="panel stack">
-        <div>
-          <div className="badge">Patient Portal</div>
-          <h2 style={{ marginTop: 12 }}>Log in</h2>
-          <p>Use one of the seeded sample users or a patient you create through the admin interface.</p>
-        </div>
-        {params.error ? <p className="error">{params.error}</p> : null}
-        <form action={loginAction} className="stack">
-          <label>Email<input name="email" type="email" placeholder="mark@some-email-provider.net" required /></label>
-          <label>Password<input name="password" type="password" placeholder="Password123!" required /></label>
-          <button type="submit">Log in</button>
-        </form>
-      </section>
-      <section className="panel stack">
-        <div><div className="badge">Quick start</div><h2 style={{ marginTop: 12 }}>Sample credentials</h2></div>
-        <ul className="clean">
-          <li className="item"><strong>Mark Johnson</strong><div className="small">mark@some-email-provider.net / Password123!</div></li>
-          <li className="item"><strong>Lisa Smith</strong><div className="small">lisa@some-email-provider.net / Password123!</div></li>
-        </ul>
-        <p>Admin is intentionally open at <a href="/admin">/admin</a> to match the exercise prompt.</p>
-      </section>
-    </div>
+    <main>
+      <div className="grid grid-2" style={{ alignItems: "start" }}>
+        <section className="card">
+          <div className="stack">
+            <span className="badge">Patient Portal</span>
+            <h1>Log in</h1>
+            <p>
+              Sign in to view your upcoming appointments, medication refills, and
+              patient information.
+            </p>
+
+            <form onSubmit={handleSubmit} className="stack">
+              <label>
+                Email
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="patient@example.com"
+                  required
+                />
+              </label>
+
+              <label>
+                Password
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Enter password"
+                  required
+                />
+              </label>
+
+              {error ? <div className="error">{error}</div> : null}
+
+              <div className="row">
+                <button type="submit" disabled={loading} style={{ width: "auto" }}>
+                  {loading ? "Logging in..." : "Log In"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section className="card">
+          <div className="stack">
+            <h2>What patients can view</h2>
+            <ul className="clean">
+              <li className="item">Appointments within the next 7 days</li>
+              <li className="item">Medication refills within the next 7 days</li>
+              <li className="item">Full upcoming appointment schedule</li>
+              <li className="item">All prescriptions and refill schedule</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </main>
   );
 }

@@ -1,43 +1,42 @@
-import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
 
-const COOKIE_NAME = "zealthy_patient_session";
+const PATIENT_COOKIE_NAME = "patientId";
 
-export async function loginPatient(email: string, password: string) {
-  const patient = await db.patient.findUnique({ where: { email } });
-  if (!patient) return null;
-
-  const isValid = await bcrypt.compare(password, patient.passwordHash);
-  if (!isValid) return null;
-
+export async function getPatientSessionId() {
   const cookieStore = await cookies();
-  cookieStore.set(COOKIE_NAME, patient.id, {
+  return cookieStore.get(PATIENT_COOKIE_NAME)?.value ?? null;
+}
+
+export async function requirePatientSession() {
+  const patientId = await getPatientSessionId();
+
+  if (!patientId) {
+    redirect("/");
+  }
+
+  return patientId;
+}
+
+export async function setPatientSession(patientId: string) {
+  const cookieStore = await cookies();
+
+  cookieStore.set(PATIENT_COOKIE_NAME, patientId, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: 60 * 60 * 24 * 7,
   });
-
-  return patient;
 }
 
-export async function logoutPatient() {
+export async function clearPatientSession() {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
-}
 
-export async function getCurrentPatient() {
-  const cookieStore = await cookies();
-  const patientId = cookieStore.get(COOKIE_NAME)?.value;
-  if (!patientId) return null;
-  return db.patient.findUnique({ where: { id: patientId } });
-}
-
-export async function requirePatient() {
-  const patient = await getCurrentPatient();
-  if (!patient) redirect("/");
-  return patient;
+  cookieStore.set(PATIENT_COOKIE_NAME, "", {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    expires: new Date(0),
+  });
 }
