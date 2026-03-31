@@ -1,0 +1,39 @@
+:root {
+  --bg: #0b1020;
+  --panel: #121a2b;
+  --panel-soft: #182235;
+  --text: #e8edf7;
+  --muted: #9fb0cc;
+  --border: #2a3853;
+  --accent: #72a7ff;
+  --danger: #ff7b7b;
+  --success: #83d69c;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+main { max-width: 1120px; margin: 0 auto; padding: 32px 20px 64px; }
+.card, .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 20px; }
+.grid { display: grid; gap: 20px; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.stack { display: grid; gap: 12px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.space-between { display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap; }
+h1, h2, h3 { margin: 0 0 12px; }
+p { color: var(--muted); line-height: 1.5; }
+input, select, button, textarea { width: 100%; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-soft); color: var(--text); padding: 12px 14px; }
+button { cursor: pointer; background: var(--accent); color: #08111f; font-weight: 700; }
+button.secondary { background: transparent; color: var(--text); }
+button.danger { background: var(--danger); color: #200; }
+label { display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.badge { display: inline-block; padding: 6px 10px; border-radius: 999px; background: rgba(114,167,255,.12); color: var(--accent); font-size: 12px; }
+.error { color: #ffb4b4; }
+.success { color: var(--success); }
+.small { font-size: 13px; color: var(--muted); }
+ul.clean { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+li.item { padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-soft); }
+form.inline { display: inline; }

@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Patient {
+  id            String         @id @default(cuid())
+  name          String
+  email         String         @unique
+  passwordHash  String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  appointments  Appointment[]
+  prescriptions Prescription[]
+}
+
+model Appointment {
+  id             String         @id @default(cuid())
+  patientId      String
+  providerName   String
+  startDateTime  DateTime
+  repeatSchedule RepeatSchedule
+  endDate        DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model Prescription {
+  id              String         @id @default(cuid())
+  patientId       String
+  medicationName  String
+  dosage          String
+  quantity        Int
+  refillDate      DateTime
+  refillSchedule  RepeatSchedule
+  endDate         DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model MedicationOption {
+  id   String @id @default(cuid())
+  name String @unique
+}
+
+model DosageOption {
+  id    String @id @default(cuid())
+  value String @unique
+}
+
+enum RepeatSchedule {
+  none
+  weekly
+  monthly
+}
