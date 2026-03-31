@@ -1,78 +1,221 @@
 import Link from "next/link";
-import { deleteAppointmentAction, deletePrescriptionAction, createAppointmentAction, createPrescriptionAction } from "@/app/actions";
+import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import "./patient-detail.css";
 
-export default async function PatientDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ error?: string }> }) {
+function formatDate(value: Date | null | undefined) {
+  if (!value) return "—";
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function formatRepeatSchedule(value: string) {
+  if (!value) return "None";
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+export default async function PatientDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
-  const query = await searchParams;
-  const patient = await db.patient.findUniqueOrThrow({ where: { id }, include: { appointments: true, prescriptions: true } });
-  const medicationOptions = await db.medicationOption.findMany({ orderBy: { name: "asc" } });
-  const dosageOptions = await db.dosageOption.findMany({ orderBy: { value: "asc" } });
-  const addAppointment = createAppointmentAction.bind(null, id);
-  const addPrescription = createPrescriptionAction.bind(null, id);
+
+  const patient = await db.patient.findUnique({
+    where: { id },
+    include: {
+      appointments: {
+        orderBy: { startDateTime: "asc" },
+      },
+      prescriptions: {
+        orderBy: { refillDate: "asc" },
+      },
+    },
+  });
+
+  if (!patient) {
+    notFound();
+  }
+
+  const nextAppointment = patient.appointments[0];
+  const nextPrescription = patient.prescriptions[0];
 
   return (
-    <div className="grid grid-2">
-      <section className="panel stack">
-        <div className="space-between">
-          <div><div className="badge">Patient</div><h2 style={{ marginTop: 12 }}>{patient.name}</h2><div className="small">{patient.email}</div></div>
-          <Link href={`/admin/patients/${patient.id}/edit`}>Edit</Link>
+    <main>
+      <div className="space-between mb-20">
+        <div>
+          <span className="badge">Admin / Patient</span>
+          <h1 className="mt-12">{patient.name}</h1>
+          <p>{patient.email}</p>
         </div>
-        {query.error ? <p className="error">{query.error}</p> : null}
-        <div className="stack">
-          <h3>Appointments</h3>
-          <ul className="clean">
-            {patient.appointments.map((appointment) => (
-              <li key={appointment.id} className="item">
-                <div className="space-between">
-                  <div>
-                    <strong>{appointment.providerName}</strong>
-                    <div className="small">Starts {appointment.startDateTime.toLocaleString()}</div>
-                    <div className="small">Repeat: {appointment.repeatSchedule}</div>
-                  </div>
-                  <form action={deleteAppointmentAction.bind(null, patient.id, appointment.id)}><button type="submit" className="danger">Delete</button></form>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <form action={addAppointment} className="grid grid-2">
-            <label>Provider name<input name="providerName" required /></label>
-            <label>First appointment date/time<input name="startDateTime" type="datetime-local" required /></label>
-            <label>Repeat schedule<select name="repeatSchedule" defaultValue="none"><option value="none">None</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></label>
-            <label>End recurring on<input name="endDate" type="date" /></label>
-            <div className="row" style={{ gridColumn: "1 / -1" }}><button type="submit">Add appointment</button></div>
-          </form>
+
+        <div className="row">
+          <Link href="/admin">
+            <button type="button" className="secondary btn-auto">
+              Back to Patients
+            </button>
+          </Link>
+
+          <Link href={`/admin/patients/${patient.id}/edit`}>
+            <button type="button" className="btn-auto">
+              Edit Patient
+            </button>
+          </Link>
         </div>
+      </div>
+
+      <div className="grid grid-3 mb-20">
+        <section className="card">
+          <div className="stack">
+            <h3>Patient Info</h3>
+            <div>
+              <div className="small">Name</div>
+              <div>{patient.name}</div>
+            </div>
+            <div>
+              <div className="small">Email</div>
+              <div>{patient.email}</div>
+            </div>
+            <div>
+              <div className="small">Created</div>
+              <div>{formatDate(patient.createdAt)}</div>
+            </div>
+          </div>
+        </section>
+
+        <section className="card">
+          <div className="stack">
+            <h3>Appointments</h3>
+            <div>
+              <div className="small">Total</div>
+              <div>{patient.appointments.length}</div>
+            </div>
+            <div>
+              <div className="small">Next Appointment</div>
+              <div>
+                {nextAppointment
+                  ? `${nextAppointment.providerName} — ${formatDate(
+                    nextAppointment.startDateTime,
+                  )}`
+                  : "—"}
+              </div>
+            </div>
+            <Link href={`/admin/patients/${patient.id}/appointments`}>
+              <button type="button">Manage Appointments</button>
+            </Link>
+          </div>
+        </section>
+
+        <section className="card">
+          <div className="stack">
+            <h3>Prescriptions</h3>
+            <div>
+              <div className="small">Total</div>
+              <div>{patient.prescriptions.length}</div>
+            </div>
+            <div>
+              <div className="small">Next Refill</div>
+              <div>
+                {nextPrescription
+                  ? `${nextPrescription.medicationName} — ${formatDate(
+                    nextPrescription.refillDate,
+                  )}`
+                  : "—"}
+              </div>
+            </div>
+            <Link href={`/admin/patients/${patient.id}/prescriptions`}>
+              <button type="button">Manage Prescriptions</button>
+            </Link>
+          </div>
+        </section>
+      </div>
+
+      <section className="card mb-20">
+        <div className="space-between mb-16">
+          <div>
+            <h2>Appointments</h2>
+            <p>Upcoming and recurring appointment records for this patient.</p>
+          </div>
+
+          <Link href={`/admin/patients/${patient.id}/appointments`}>
+            <button type="button" className="btn-auto">
+              Add / Manage
+            </button>
+          </Link>
+        </div>
+
+        {patient.appointments.length === 0 ? (
+          <p>No appointments found.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>First Appointment</th>
+                <th>Repeat Schedule</th>
+                <th>Ends</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patient.appointments.map((appointment) => (
+                <tr key={appointment.id}>
+                  <td>{appointment.providerName}</td>
+                  <td>{formatDate(appointment.startDateTime)}</td>
+                  <td>{formatRepeatSchedule(appointment.repeatSchedule)}</td>
+                  <td>{formatDate(appointment.endDate)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
-      <section className="panel stack">
-        <div className="stack">
-          <h3>Prescriptions</h3>
-          <ul className="clean">
-            {patient.prescriptions.map((prescription) => (
-              <li key={prescription.id} className="item">
-                <div className="space-between">
-                  <div>
-                    <strong>{prescription.medicationName} {prescription.dosage}</strong>
-                    <div className="small">Quantity: {prescription.quantity}</div>
-                    <div className="small">First refill: {prescription.refillDate.toLocaleDateString()}</div>
-                    <div className="small">Repeat: {prescription.refillSchedule}</div>
-                  </div>
-                  <form action={deletePrescriptionAction.bind(null, patient.id, prescription.id)}><button type="submit" className="danger">Delete</button></form>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <form action={addPrescription} className="grid grid-2">
-            <label>Medication<select name="medicationName" required>{medicationOptions.map((option) => <option key={option.id} value={option.name}>{option.name}</option>)}</select></label>
-            <label>Dosage<select name="dosage" required>{dosageOptions.map((option) => <option key={option.id} value={option.value}>{option.value}</option>)}</select></label>
-            <label>Quantity<input name="quantity" type="number" min="1" defaultValue="1" required /></label>
-            <label>First refill date<input name="refillDate" type="date" required /></label>
-            <label>Refill schedule<select name="refillSchedule" defaultValue="monthly"><option value="none">None</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option></select></label>
-            <label>End recurring on<input name="endDate" type="date" /></label>
-            <div className="row" style={{ gridColumn: "1 / -1" }}><button type="submit">Add prescription</button></div>
-          </form>
+
+      <section className="card">
+        <div className="space-between mb-16">
+          <div>
+            <h2>Prescriptions</h2>
+            <p>Active medication records and refill schedules.</p>
+          </div>
+
+          <Link href={`/admin/patients/${patient.id}/prescriptions`}>
+            <button type="button" className="btn-auto">
+              Add / Manage
+            </button>
+          </Link>
         </div>
+
+        {patient.prescriptions.length === 0 ? (
+          <p>No prescriptions found.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Medication</th>
+                <th>Dosage</th>
+                <th>Quantity</th>
+                <th>Refill Date</th>
+                <th>Refill Schedule</th>
+                <th>Ends</th>
+              </tr>
+            </thead>
+            <tbody>
+              {patient.prescriptions.map((prescription) => (
+                <tr key={prescription.id}>
+                  <td>{prescription.medicationName}</td>
+                  <td>{prescription.dosage}</td>
+                  <td>{prescription.quantity}</td>
+                  <td>{formatDate(prescription.refillDate)}</td>
+                  <td>{formatRepeatSchedule(prescription.refillSchedule)}</td>
+                  <td>{formatDate(prescription.endDate)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
-    </div>
+    </main>
   );
 }
