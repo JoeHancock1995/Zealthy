@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { addMonths } from "date-fns";
 import { db } from "@/lib/db";
