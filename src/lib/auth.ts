@@ -18,17 +18,6 @@ export async function requirePatientSession() {
   return patientId;
 }
 
-export async function setPatientSession(patientId: string) {
-  const cookieStore = await cookies();
-
-  cookieStore.set(PATIENT_COOKIE_NAME, patientId, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-  });
-}
-
 export async function clearPatientSession() {
   const cookieStore = await cookies();
 

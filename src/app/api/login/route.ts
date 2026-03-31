@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { setPatientSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
     const formData = await req.formData();
@@ -12,7 +11,7 @@ export async function POST(req: Request) {
     if (!email || !password) {
         return NextResponse.json(
             { error: "Email and password are required." },
-            { status: 400 },
+            { status: 400 }
         );
     }
 
@@ -23,7 +22,7 @@ export async function POST(req: Request) {
     if (!patient) {
         return NextResponse.json(
             { error: "Invalid email or password." },
-            { status: 401 },
+            { status: 401 }
         );
     }
 
@@ -32,11 +31,18 @@ export async function POST(req: Request) {
     if (!isValid) {
         return NextResponse.json(
             { error: "Invalid email or password." },
-            { status: 401 },
+            { status: 401 }
         );
     }
 
-    await setPatientSession(patient.id);
+    const response = NextResponse.json({ success: true });
 
-    return NextResponse.json({ success: true });
+    response.cookies.set("patientId", patient.id, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+    });
+
+    return response;
 }
