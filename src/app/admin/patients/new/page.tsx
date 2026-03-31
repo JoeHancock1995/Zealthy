@@ -1,4 +1,4 @@
-import { createPatientAction } from "@/app/actions";
+import { createPatientAction } from "./actions";
 
 export default async function NewPatientPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const params = await searchParams;
