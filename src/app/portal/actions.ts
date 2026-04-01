@@ -1,10 +1,9 @@
-export const runtime = "nodejs";
+"use server";
 
 import { redirect } from "next/navigation";
 import { clearPatientSession } from "@/lib/auth";
 
-// async functions can still run on the server here
-export async function logout() {
+export async function logoutPatient() {
     await clearPatientSession();
     redirect("/login");
 }
