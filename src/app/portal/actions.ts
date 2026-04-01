@@ -5,5 +5,5 @@ import { clearPatientSession } from "@/lib/auth";
 
 export async function logoutPatient() {
     await clearPatientSession();
-    redirect("/login");
+    redirect("/"); 
 }
