@@ -116,7 +116,7 @@ Link: https://neon.com/docs/ai/skills/neon-postgres/references/branching.md
 
 ## Autoscaling
 
-Use this when the user needs compute to scale automatically with workload and wants guidance on CU sizing and runtime behavior.
+Use this when the user needs compute to scale automatically with workload and wants guidance on CU sizing and behavior.
 
 Link: https://neon.com/docs/introduction/autoscaling.md
 
