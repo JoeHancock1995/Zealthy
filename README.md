@@ -96,8 +96,8 @@ pnpm prisma db seed
 
 ## Submission
 Provide:
-- GitHub repo URL
-- Live deployed URL (Vercel)
+- GitHub repo URL : https://github.com/JoeHancock1995/Zealthy
+- Live deployed URL (Vercel): https://zealthy-pi.vercel.app/
 
 ---
 
